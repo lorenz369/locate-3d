@@ -4,7 +4,7 @@ Official codebase for the `Locate-3D` models, the `3D-JEPA` encoders, and the `L
 
 **[Meta AI Research, FAIR](https://ai.facebook.com/research/)**
 
-[\[Paper\]](https://ai.meta.com/research/publications/locate-3d-real-world-object-localization-via-self-supervised-learning-in-3d) 
+[\[Paper\]](https://arxiv.org/pdf/2504.14151)
 [\[Demo\]](https://locate3d.atmeta.com/demo)
 
 ## Locate 3D
