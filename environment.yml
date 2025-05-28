@@ -1,4 +1,4 @@
-name: locate-3d2
+name: locate-3d
 channels:
   - conda-forge
   - pyg
