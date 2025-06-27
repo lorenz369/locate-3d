@@ -13,7 +13,7 @@ import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
 
-from preprocessing.voxelized_pointcloud import VoxelizedPointcloud
+from voxelized_pointcloud import VoxelizedPointcloud
 
 logger = logging.getLogger(__name__)
 MAX_OBJ_NAME_LEN = 77

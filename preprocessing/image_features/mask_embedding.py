@@ -199,11 +199,20 @@ class MaskEmbeddingFeatureImageGenerator:
         """
         Takes a float image as input, extracts masks, computes the 2D encoder features on the masks
         and on the whole image and returns the new "image" where RGB is replaced with the encoder features.
+        
+        Args:
+            image: RGB image tensor in (H, W, 3) format, with values in [0, 1]
         """
         if self.image_text_encoder is None:
             return None
 
+        # Convert float [0,1] to uint8 [0,255]
         uint_img = (image.cpu().numpy() * 255).astype(np.uint8)
+        
+        # Ensure image is RGB (H, W, 3)
+        if uint_img.shape[-1] != 3:
+            raise ValueError(f"Expected RGB image with 3 channels, got shape {uint_img.shape}")
+            
         masks = self.generate_mask(uint_img)
 
         # CLIP features global
