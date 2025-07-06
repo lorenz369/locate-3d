@@ -177,6 +177,8 @@ dataset_stats/
 # log file
 logs/*
 
+# pt file
+*.pt
 
 *.DS_Store
 
