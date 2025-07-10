@@ -12,7 +12,7 @@ import torch
 import pyminiply
 import json
 
-from locate3d_data.data_utils import get_image_from_path, get_depth_image_from_path
+from .data_utils import get_image_from_path, get_depth_image_from_path
 
 
 class ScanNetDataset:

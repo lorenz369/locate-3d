@@ -10,9 +10,9 @@ from typing import Any, Dict
 import torch
 import os
 
-from locate3d_data.scannet_dataset import ScanNetDataset
-from locate3d_data.scannetpp_dataset import ScanNetPPDataset
-from locate3d_data.arkitscenes_dataset import ARKitScenesDataset
+from .scannet_dataset import ScanNetDataset
+from .scannetpp_dataset import ScanNetPPDataset
+from .arkitscenes_dataset import ARKitScenesDataset
 
 
 class Locate3DDataset:

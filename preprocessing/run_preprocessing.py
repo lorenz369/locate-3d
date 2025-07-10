@@ -19,8 +19,8 @@ import torch
 from omegaconf import OmegaConf
 from pathlib import Path
 
-from preprocessing.pointcloud_featurizer import FeatureLifter3D
-from locate3d_data.locate3d_dataset import Locate3DDataset
+from .pointcloud_featurizer import FeatureLifter3D
+from ..locate3d_data.locate3d_dataset import Locate3DDataset
 
 
 def preprocess_scenes(args, start_idx, end_idx):
@@ -102,6 +102,7 @@ if __name__ == "__main__":
         help="File name of the Locate 3D Dataset to preprocess",
         choices=[
             "locate3d_data/dataset/all.json",
+            "locate3d_data/dataset/custom_scene.json",
             "locate3d_data/dataset/train_scannet.json",
             "locate3d_data/dataset/val_arkitscenes.json",
             "locate3d_data/dataset/train.json",

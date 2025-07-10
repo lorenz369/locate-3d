@@ -11,6 +11,7 @@ from pathlib import Path
 import torch
 import cv2
 import numpy as np
+import imageio.v2 as imageio
 
 from scipy.interpolate import CubicSpline
 from scipy.spatial.transform import Rotation as R
@@ -26,49 +27,55 @@ def get_image_from_path(
 ) -> torch.Tensor:
 
     pil_image = Image.open(image_path)
+
+    # Explicitly convert RGBA images to RGB to remove the alpha channel.
+    if pil_image.mode == 'RGBA':
+        pil_image = pil_image.convert('RGB')
+
     assert (height is None) == (width is None)  # Neither or both
     if height is not None and pil_image.size != (width, height):
-        pil_image = pil_image.resize((width, height), resample=resample)
+        # Pass resample filter positionally for wider compatibility
+        pil_image = pil_image.resize((width, height), resample)
 
+    # Convert the final PIL image to a PyTorch tensor
     image = F.to_tensor(pil_image)
-
-    if not keep_alpha and image.shape[-1] == 4:
-        image = image[:, :, :3]
 
     return image
 
 
 def get_depth_image_from_path(
-    filepath: Path,
-    height: Optional[int] = None,
-    width: Optional[int] = None,
-    scale_factor: float = 1.0,
-    interpolation: int = cv2.INTER_NEAREST,
-) -> torch.Tensor:
-    """Loads, rescales and resizes depth images.
-    Filepath points to a 16-bit or 32-bit depth image, or a numpy array `*.npy`.
-    # Adapted from https://github.com/nerfstudio-project/nerfstudio/blob/main/nerfstudio/data/dataparsers/scannet_dataparser.py
-    Args:
-        filepath: Path to depth image.
-        height: Target depth image height.
-        width: Target depth image width.
-        scale_factor: Factor by which to scale depth image.
-        interpolation: Depth value interpolation for resizing.
-
-    Returns:
-        Depth image torch tensor with shape [height, width].
+    fpath: str, height: int, width: int, scale_factor: float
+) -> np.ndarray:
     """
-    assert (height is None) == (width is None)  # Neither or both
-    if filepath.suffix == ".npy":
-        image = np.load(filepath) * scale_factor
-        assert (height is None) == (width is None)  # Neither or both
+    Reads a depth image from a path, handles different formats, and resizes.
+    """
+    # Convert the fpath object (which may be a Path object) to a string
+    fpath = str(fpath)
+
+    if fpath.endswith(".png") or fpath.endswith(".jpg"):
+        image = imageio.imread(fpath)
+    elif fpath.endswith(".npz"):
+        try:
+            with np.load(fpath) as data:
+                if 'depth' in data:
+                    image = data['depth']
+                else:
+                    image = data['arr_0']
+        except Exception as e:
+            print(f"Error loading NPZ file {fpath}: {e}")
+            return None
     else:
-        image = cv2.imread(str(filepath.absolute()), cv2.IMREAD_ANYDEPTH)
-        image = image.astype(np.float64) * scale_factor
-    do_resize = height is not None and image.shape[:2] != (height, width)
-    if do_resize:
-        image = cv2.resize(image, (width, height), interpolation=interpolation)
-    return torch.from_numpy(image[:, :])
+        image = None
+
+    if image is None:
+        return None
+
+    current_height, current_width = image.shape[:2]
+    if current_height != height or current_width != width:
+        image = np.array(Image.fromarray(image).resize((width, height), Image.NEAREST))
+
+    image = image.astype(np.float64) * scale_factor
+    return image
 
 
 def intrinsic_array_to_matrix(intrinsics: np.ndarray):

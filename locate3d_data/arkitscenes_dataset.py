@@ -12,7 +12,7 @@ import torch
 import pyminiply
 import json
 
-from locate3d_data.data_utils import (
+from .data_utils import (
     get_image_from_path,
     get_depth_image_from_path,
     intrinsic_array_to_matrix,
@@ -24,9 +24,9 @@ from locate3d_data.data_utils import (
 
 
 class ARKitScenesDataset:
-    DEFAULT_HEIGHT = 192.0
-    DEFAULT_WIDTH = 256.0
-    DEPTH_SCALE_FACTOR = 0.001  # to MM
+    DEFAULT_HEIGHT = 192 # TODO ???
+    DEFAULT_WIDTH = 256  # TODO ???
+    DEPTH_SCALE_FACTOR = 1  # to MM
     frame_skip = 30
 
     def __init__(self, dataset_path):
@@ -87,7 +87,9 @@ class ARKitScenesDataset:
         img_names = [
             img_name
             for img_name in img_names
-            if os.path.exists(img_name.replace(self.rgb_folder, self.depth_folder))
+            if os.path.exists(
+                img_name.replace(self.rgb_folder, self.depth_folder).replace(".png", ".npz")
+            )
         ]
 
         assert len(img_names) > 0, f"Found zero images for scene {scan_name}"
@@ -101,9 +103,8 @@ class ARKitScenesDataset:
 
         # Depth
         depth_names = [
-            Path(img_name.replace(self.rgb_folder, self.depth_folder))
+            Path(img_name.replace(self.rgb_folder, self.depth_folder).replace(".png", ".npz"))
             for img_name in img_names
-            if os.path.exists(img_name.replace(self.rgb_folder, self.depth_folder))
         ]
 
         depths = []
@@ -114,7 +115,9 @@ class ARKitScenesDataset:
                 width=self.DEFAULT_WIDTH,
                 scale_factor=self.DEPTH_SCALE_FACTOR,
             )
-            depths.append(depth)
+            # Convert numpy array to torch tensor before appending
+            depths.append(torch.from_numpy(depth))
+            print('Depth min/max:', depth.min(), depth.max())
 
         # Intrinsics
         img_timestamps = [
@@ -146,7 +149,9 @@ class ARKitScenesDataset:
         # Poses
         poses_file = working_dir / "lowres_wide.traj"
         timestamped_poses = np.loadtxt(poses_file)
-        pose_timestamps, poses = timestamped_poses[:, 0], timestamped_poses[:, 1:]
+        pose_timestamps = timestamped_poses[:, 0]
+        raw6 = timestamped_poses[:,1:] 
+        poses = raw6[:, [3,4,5,  0,1,2]]
 
         clipped_img_timestamps = np.clip(
             img_timestamps,
