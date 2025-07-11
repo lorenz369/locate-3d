@@ -1,0 +1,27 @@
+[
+  {
+    "object_id": 1,
+    "object_name": "lab_object",
+    "ann_id": 0,
+    "description": "lab scan for preprocessing",
+    "token": [
+      "lab",
+      "scan",
+      "for",
+      "preprocessing"
+    ],
+    "entities": [
+      [
+        [
+          0
+        ],
+        [
+          "1_lab_object"
+        ]
+      ]
+    ],
+    "primary_key": "lab_1_custom",
+    "scene_id": "lab_1",
+    "scene_dataset": "ScanNet++"
+  }
+] 

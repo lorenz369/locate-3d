@@ -40,6 +40,26 @@ def preprocess_scenes(args, start_idx, end_idx):
         arkitscenes_data_dir=args.arkitscenes_data_dir,
     )
     scene_list = sorted(l3dd.list_scenes())
+    
+    print(f"Found {len(scene_list)} scenes to process")
+    if len(scene_list) == 0:
+        print("ERROR: No scenes found in the annotation file!")
+        return
+    
+    # Handle -1 end_idx to mean process all scenes
+    if end_idx == -1:
+        end_idx = len(scene_list)
+        print(f"Setting end_idx to {end_idx} (all scenes)")
+    
+    print(f"Processing scenes from index {start_idx} to {end_idx}")
+    
+    if start_idx >= len(scene_list):
+        print(f"ERROR: start_idx ({start_idx}) is >= number of scenes ({len(scene_list)})")
+        return
+    
+    if end_idx > len(scene_list):
+        print(f"WARNING: end_idx ({end_idx}) is > number of scenes ({len(scene_list)}), clamping to {len(scene_list)}")
+        end_idx = len(scene_list)
 
     pointcloud_featurizer_clip_cfg = OmegaConf.load(
         os.path.join(SCRIPT_DIR, "config/clip.yaml")
@@ -56,6 +76,8 @@ def preprocess_scenes(args, start_idx, end_idx):
         scene_dataset = scene_list[idx][0]
         scene_id = scene_list[idx][1]
         frames_used = scene_list[idx][2]
+
+        print(f"Processing scene {idx+1}/{end_idx}: {scene_dataset}/{scene_id}")
 
         # Early skip if the scene is already cached
         if frames_used is None:
@@ -100,18 +122,6 @@ if __name__ == "__main__":
         "--l3dd_annotations_fpath",
         type=str,
         help="File name of the Locate 3D Dataset to preprocess",
-        choices=[
-            "locate3d_data/dataset/all.json",
-            "locate3d_data/dataset/train_scannet.json",
-            "locate3d_data/dataset/val_arkitscenes.json",
-            "locate3d_data/dataset/train.json",
-            "locate3d_data/dataset/train_scannetpp.json",
-            "locate3d_data/dataset/val_scannet.json",
-            "locate3d_data/dataset/train_arkitscenes.json",
-            "locate3d_data/dataset/train_arkitscenes_subset.json",
-            "locate3d_data/dataset/val.json",
-            "locate3d_data/dataset/val_scannetpp.json",
-        ],
         required=True,
     )
     parser.add_argument(
