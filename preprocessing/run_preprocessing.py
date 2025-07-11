@@ -108,6 +108,7 @@ if __name__ == "__main__":
             "locate3d_data/dataset/train_scannetpp.json",
             "locate3d_data/dataset/val_scannet.json",
             "locate3d_data/dataset/train_arkitscenes.json",
+            "locate3d_data/dataset/train_arkitscenes_subset.json",
             "locate3d_data/dataset/val.json",
             "locate3d_data/dataset/val_scannetpp.json",
         ],

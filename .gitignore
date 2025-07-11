@@ -182,3 +182,8 @@ logs/*
 
 # web stuff
 node_modules/
+
+.DS_Store
+__pycache__/
+*.rrd
+cache/ARKitScenes/*.pt

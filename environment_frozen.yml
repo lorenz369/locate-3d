@@ -414,7 +414,7 @@ dependencies:
       - blinker==1.9.0
       - ccimport==0.4.4
       - click==8.2.1
-      - clip==1.0
+      - git+https://github.com/openai/CLIP.git
       - configargparse==1.7.1
       - cumm==0.7.11
       - cumm-cu121==0.7.11
